@@ -1,0 +1,216 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Aarakshya! 🎈</title>
+    <link href="https://fonts.googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #ffd700;
+            --pink: #ff4d6d;
+            --blue: #4cc9f0;
+            --glass: rgba(255, 255, 255, 0.9);
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            /* Festive Background Pattern */
+            background-color: #ffdeeb;
+            background-image: radial-gradient(#ff4d6d 0.5px, transparent 0.5px), radial-gradient(#ff4d6d 0.5px, #ffdeeb 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Party Banner/Bunting */
+        .bunting {
+            position: fixed; top: 0; left: 0; width: 100%;
+            height: 50px; background-image: repeating-linear-gradient(90deg, var(--pink) 0, var(--pink) 40px, transparent 40px, transparent 60px, var(--blue) 60px, var(--blue) 100px, transparent 100px, transparent 120px);
+            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 95% 70%, 90% 100%, 85% 70%, 80% 100%, 75% 70%, 70% 100%, 65% 70%, 60% 100%, 55% 70%, 50% 100%, 45% 70%, 40% 100%, 35% 70%, 30% 100%, 25% 70%, 20% 100%, 15% 70%, 10% 100%, 5% 70%, 0% 100%);
+            z-index: 5;
+        }
+
+        /* Floating Balloons */
+        .balloon-container { position: fixed; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+        .balloon {
+            position: absolute; bottom: -100px;
+            width: 50px; height: 65px; border-radius: 50%;
+            animation: floatUp 12s linear infinite;
+        }
+        .balloon::after { content: ""; position: absolute; bottom: -20px; left: 24px; width: 2px; height: 20px; background: rgba(0,0,0,0.1); }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            100% { transform: translateY(-110vh) rotate(20deg); opacity: 0; }
+        }
+
+        /* The Card */
+        .card {
+            width: 85%; max-width: 450px;
+            background: var(--glass);
+            padding: 40px; border-radius: 20px;
+            border: 5px solid white;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            text-align: center; position: relative; z-index: 10;
+            transition: 1s ease;
+        }
+
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            color: var(--pink); font-size: 3rem; margin: 0;
+        }
+
+        .writing-container {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.6rem; color: #444;
+            line-height: 1.6; text-align: left; margin: 20px 0;
+        }
+
+        .line { display: block; overflow: hidden; white-space: nowrap; width: 0; margin-bottom: 8px; border-right: 3px solid var(--pink); }
+
+        .animate-write { animation: typing 2.5s steps(40, end) forwards; }
+        @keyframes typing { from { width: 0 } to { width: 100% } }
+
+        .btn {
+            background: var(--pink); color: white; border: none;
+            padding: 15px 35px; border-radius: 50px;
+            font-weight: 600; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 77, 109, 0.3);
+            transition: 0.3s;
+        }
+        .btn:hover { transform: scale(1.1); background: #e63958; }
+
+        #heartCanvas { position: fixed; top: 0; left: 0; z-index: 100; pointer-events: none; }
+        .hidden { display: none; }
+        .fade-out { opacity: 0; transform: scale(0.5); }
+    </style>
+</head>
+<body>
+
+    <div class="bunting"></div>
+    <div class="balloon-container" id="balloonBox"></div>
+    <canvas id="heartCanvas"></canvas>
+
+    <!-- PAGE 1 -->
+    <div id="screen1" class="card">
+        <h1>Hi Aarakshya! 🎂</h1>
+        <p>Your birthday surprise is ready!</p>
+        <button class="btn" onclick="startWriting()">Open Message</button>
+    </div>
+
+    <!-- PAGE 2 -->
+    <div id="screen2" class="card hidden">
+        <h1 style="font-size: 2rem;">A Wish for You...</h1>
+        <div class="writing-container" id="wishBox"></div>
+        <button id="loveBtn" class="btn hidden" onclick="sendLove()">With Love ❤️</button>
+    </div>
+
+    <script>
+        // Create Balloons
+        const bBox = document.getElementById('balloonBox');
+        const colors = ['#ff4d6d', '#ffd700', '#4cc9f0', '#7209b7', '#ffbe0b'];
+        
+        function makeBalloon() {
+            const b = document.createElement('div');
+            b.className = 'balloon';
+            b.style.left = Math.random() * 100 + '%';
+            b.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+            b.style.animationDuration = (Math.random() * 5 + 7) + 's';
+            bBox.appendChild(b);
+            setTimeout(() => b.remove(), 12000);
+        }
+        setInterval(makeBalloon, 700);
+
+        // Writing Animation
+        const wishLines = [
+            "May your path be paved with gold,",
+            "With stories of success yet untold,",
+            "May joy follow wherever you go,",
+            "And your inner strength continue to grow,",
+            "Happy Birthday, Aarakshya!",
+            "      -- RAJIB DAHAL --"
+        ];
+
+        function startWriting() {
+            document.getElementById('screen1').classList.add('hidden');
+            document.getElementById('screen2').classList.remove('hidden');
+            writeLine(0);
+        }
+
+        function writeLine(index) {
+            if (index < wishLines.length) {
+                const container = document.getElementById('wishBox');
+                const lineElem = document.createElement('span');
+                lineElem.className = 'line animate-write';
+                lineElem.innerText = wishLines[index];
+                container.appendChild(lineElem);
+                setTimeout(() => {
+                    lineElem.style.borderRight = "none";
+                    writeLine(index + 1);
+                }, 2800); 
+            } else {
+                document.getElementById('loveBtn').classList.remove('hidden');
+            }
+        }
+
+        // Heart Burst (Send to Me)
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+        let hearts = [];
+
+        function sendLove() {
+            document.getElementById('screen2').classList.add('fade-out');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            for(let i=0; i<100; i++) {
+                hearts.push({
+                    x: canvas.width / 2, y: canvas.height / 2,
+                    size: Math.random() * 10 + 5,
+                    vx: (Math.random() - 0.5) * 20, vy: (Math.random() - 0.5) * 20,
+                    op: 1
+                });
+            }
+            loop();
+            setTimeout(() => alert("Love Received! ❤️ Happy Birthday Aarakshya!"), 1500);
+        }
+
+        function loop() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            hearts.forEach(h => {
+                h.x += h.vx; h.y += h.vy; h.op -= 0.01; h.size += 0.2;
+                ctx.globalAlpha = h.op;
+                ctx.fillStyle = '#ff4d6d';
+                ctx.beginPath();
+                ctx.arc(h.x, h.y, h.size, 0, Math.PI*2);
+                ctx.fill();
+            });
+            hearts = hearts.filter(h => h.op > 0);
+            if(hearts.length > 0) requestAnimationFrame(loop);
+        }
+    </script>
+    <!-- Hidden audio -->
+<audio id="bg-music" loop>
+    <source src="{% static 'birthday.mp3' %}" type="audio/mpeg">
+</audio>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const music = document.getElementById("bg-music");
+
+    // Try to autoplay
+    music.play().catch(() => {
+        // If browser blocks autoplay, play on first user interaction
+        document.addEventListener("click", () => {
+            music.play();
+        }, { once: true });
+    });
+});
+</script>
+</body>
+</html>
